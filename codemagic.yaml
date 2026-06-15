@@ -1,0 +1,32 @@
+workflows:
+  medicare-production-deployment:
+    name: MediCare Native Build & Deploy
+    environment:
+      flutter: stable
+      groups:
+        - google_play_credentials
+        - app_store_credentials
+    scripts:
+      - name: Get packages
+        script: |
+          flutter packages pub get
+      - name: Flutter Testing
+        script: |
+          flutter test
+      - name: Build Android App Bundle
+        script: |
+          flutter build appbundle --release
+      - name: Build iOS IPA
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+    publishing:
+      google_play:
+        credentials: $GCP_PLAY_JSON
+        track: production
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
